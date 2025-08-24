@@ -406,10 +406,8 @@
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, addDoc, collection, getDocs, getDoc, deleteDoc, serverTimestamp, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
         
-        // --- INÍCIO DA ALTERAÇÃO ---
-        // Ofuscação da NOVA chave do Firebase.
-        const encodedConfig = 'eyJhcGlLZXkiOiJBSXphU3lBeVdIeWJLckJoVTFuZWRLNXZ2UE1BcXg5bWhXa3V2Q1kiLCJhdXRoRG9tYWluIjoic2FtcGxlLWZpcmViYXNlLWFpLWFwcC03YzRiOC5maXJlYmFzZWFwcC5jb20iLCJwcm9qZWN0SWQiOiJzYW1wbGUtZmlyZWJhc2UtYWktYXBwLTdjNGI4Iiwic3RvcmFnZUJ1Y2tldCI6InNhbXBsZS1maXJlYmFzZS1haS1hcHAtN2M0YjguYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjYxNDg5MjIzODQiLCJhcHBJZCI6IjE6NjE0ODkyMjM4NDp3ZWI6YmM2YzllZTM0MGQ5NzI2YWNmYmU5NSJ9';
-        // --- FIM DA ALTERAÇÃO ---
+        // Ofuscação da chave do Firebase para segurança básica.
+        const encodedConfig = 'eyJhcGlLZXkiOiJBSXphU3lEcjU0NGU0M19pS1dOVkw5VUNLZEtPTk1fczlfZ0d4VHMiLCJhdXRoRG9tYWluIjoic2FtcGxlLWZpcmViYXNlLWFpLWFwcC03YzRiOC5maXJlYmFzZWFwcC5jb20iLCJwcm9qZWN0SWQiOiJzYW1wbGUtZmlyZWJhc2UtYWktYXBwLTdjNGI4Iiwic3RvcmFnZUJ1Y2tldCI6InNhbXBsZS1maXJlYmFzZS1haS1hcHAtN2M0YjguYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjYxNDg5MjIzODQiLCJhcHBJZCI6IjE6NjE0ODkyMjM4NDp3ZWI6YmM2YzllZTM0MGQ5NzI2YWNmYmU5NSJ9';
         const decodedConfig = atob(encodedConfig);
         const firebaseConfig = JSON.parse(decodedConfig);
 
@@ -465,11 +463,6 @@
 
             if (data.observacoes) {
                 container.innerHTML += `<div class="mb-4"><h4 class="font-bold text-primary-blue">Observações Gerais:</h4><p class="text-text-muted whitespace-pre-wrap">${data.observacoes}</p></div>`;
-            }
-
-            if (!data.dias || !Array.isArray(data.dias) || data.dias.length === 0) {
-                container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>';
-                return;
             }
 
             const youtubeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-red-500"><path fill-rule="evenodd" d="M19.802 5.802a3.001 3.001 0 00-2.122-2.122C16.066 3.5 12 3.5 12 3.5s-4.066 0-5.68.18c-.79.09-1.52.412-2.122 1.014-.602.602-.924 1.332-1.014 2.122C3 8.32 3 12 3 12s0 3.68.18 5.198c.09.79.412 1.52 1.014 2.122.602.602 1.332.924 2.122 1.014C7.934 20.5 12 20.5 12 20.5s4.066 0 5.68-.18c.79-.09 1.52-.412 2.122-1.014.602-.602-.924 1.332-1.014-2.122.18-1.518.18-5.198.18-5.198s0-3.68-.18-5.198zM9.75 15.12V8.88l5.25 3.12-5.25 3.12z" clip-rule="evenodd" /></svg>`;
@@ -1268,6 +1261,7 @@ Instruções detalhadas obrigatórias:
 
 - Cobertura completa de todos os músculos ao longo da semana: peito, costas, ombros, bíceps, tríceps, quadríceps, glúteos, posteriores, panturrilhas, abdômen, antebraço e trapézio.
 - Exercícios devem ser reais, populares e reconhecidos em academias, usando nomes específicos e equipamento correto (ex: “Supino reto com barra”, “Cadeira extensora”). Não criar variações estranhas ou alternativas múltiplas no mesmo item.
+- Para cada exercício, encontre e inclua um link de um vídeo real e relevante do YouTube que demonstre a execução correta. O link deve ser válido e direto para o vídeo.
 - Divisão organizada por dias (Treino 01, Treino 02…), indicando músculos principais, exercícios, séries, repetições e técnicas aplicadas.
 - **Aplicação de Técnicas Avançadas: Se o treino for para nível Intermediário ou Avançado, aplique UMA técnica avançada (como drop set, superset, rest-pause, etc.) em no MÁXIMO DOIS exercícios por dia de treino. Varie a técnica utilizada entre os dias.**
 - Progressão de intensidade de acordo com o nível do aluno (iniciante, intermediário, avançado), ajustando cargas, volume e complexidade do treino.
@@ -1342,7 +1336,8 @@ Agora, crie o plano para o seguinte aluno:
                                                 series: { type: "STRING" },
                                                 reps: { type: "STRING" },
                                                 descanso: { type: "STRING" }, 
-                                                obs: { type: "STRING" } 
+                                                obs: { type: "STRING" },
+                                                videoUrl: { type: "STRING" }
                                             } 
                                         } 
                                     } 
@@ -1358,9 +1353,7 @@ Agora, crie o plano para o seguinte aluno:
                 
                 toggleSpinner(true, "A IA está a criar um treino avançado...");
                 try {
-                    // --- INÍCIO DA ALTERAÇÃO ---
-                    const apiKey = 'AIzaSyAyWHybKrBhU1nedK5vvPMAqx9mhWkuvCY';
-                    // --- FIM DA ALTERAÇÃO ---
+                    const apiKey = "pAGdl3y1qJZXWUKXcPBb8j3PrBs2";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -1997,4 +1990,3 @@ Agora, crie o plano para o seguinte aluno:
     </script>
 </body>
 </html>
-
