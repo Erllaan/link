@@ -24,6 +24,7 @@
             }
         }
     </script>
+    <!-- LIBS PARA GERAR PDF E GRÁFICOS -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -41,12 +42,14 @@
 </head>
 <body class="bg-background-dark text-text-light font-sans flex justify-center items-start min-h-screen p-4 md:p-8 text-lg">
 
+    <!-- Notificações e Spinner de Carregamento -->
     <div id="notification" class="fixed top-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-semibold z-50 opacity-0 invisible transition-all duration-300 -translate-y-10"></div>
     <div id="loadingSpinner" class="spinner-overlay hide">
         <div class="spinner"></div>
         <p id="spinner-message" class="text-lg font-semibold text-white">Aguarde...</p>
     </div>
 
+    <!-- Tela de Visualização Pública para Alunos -->
     <div id="publicView" class="hide container bg-bg-container p-6 md:p-10 rounded-xl shadow-xl border border-border-light my-5 md:my-10 w-full">
         <div id="publicContent">
              <h1 class="text-center text-primary-blue text-3xl md:text-4xl font-bold mb-2 pb-4 border-b border-border-light drop-shadow-md">Plano de Treino</h1>
@@ -65,6 +68,7 @@
     <div id="mainApp" class="container bg-bg-container p-6 md:p-10 rounded-xl shadow-xl border border-border-light my-5 md:my-10 w-full">
         <h1 class="text-center text-primary-blue text-3xl md:text-4xl font-bold mb-6 pb-4 border-b border-border-light drop-shadow-md">Your Trainer Partner</h1>
 
+        <!-- Tela de Login -->
         <div id="telaLogin">
             <h2 class="text-xl md:text-2xl font-semibold text-primary-blue mb-4">Aceder à Plataforma</h2>
             <form id="loginForm" class="space-y-4">
@@ -89,6 +93,7 @@
             </form>
         </div>
         
+        <!-- Tela de Cadastro -->
         <div id="telaCadastro" class="hide">
             <h2 class="text-xl md:text-2xl font-semibold text-primary-blue mb-4">Criar Nova Conta</h2>
             <form id="signupForm" class="space-y-4">
@@ -117,12 +122,14 @@
             </form>
         </div>
 
+        <!-- Conteúdo Principal da Aplicação -->
         <div id="appContent" class="hide">
             <div class="text-right mb-4 flex justify-end items-center">
                 <span id="userInfo" class="text-text-muted text-sm mr-4"></span>
                 <button id="btnLogout" class="py-2 px-4 text-sm bg-btn-danger text-white rounded-lg font-semibold">Sair</button>
             </div>
 
+            <!-- Tela de Boas-Vindas -->
             <div id="telaBoasVindas" class="hide">
                 <div class="text-center p-4">
                     <h2 id="mensagemBoasVindas" class="text-3xl md:text-4xl font-bold text-primary-blue mb-4"></h2>
@@ -134,6 +141,7 @@
                 </div>
             </div>
 
+            <!-- Tela de Alunos -->
             <div id="telaAlunos" class="hide">
                  <div class="flex justify-between items-center mb-6">
                     <h2 class="text-2xl font-semibold text-primary-blue">Meus Alunos</h2>
@@ -142,6 +150,7 @@
                 <div id="listaAlunos" class="space-y-3"></div>
             </div>
 
+            <!-- Tela Gerenciar Aluno -->
             <div id="telaGerenciarAluno" class="hide">
                 <button id="btnVoltarParaAlunos" class="py-2 px-4 mb-6 bg-btn-secondary text-white rounded-lg font-semibold">← Voltar para Alunos</button>
                 <h2 id="nomeAlunoGerenciado" class="text-2xl font-semibold text-primary-blue mb-6"></h2>
@@ -155,6 +164,7 @@
                 </div>
             </div>
 
+            <!-- Tela de Acompanhamento de Evolução -->
             <div id="telaAcompanhamento" class="hide">
                 <button id="btnVoltarParaGerenciarAluno_Acomp" class="py-2 px-4 mb-6 bg-btn-secondary text-white rounded-lg font-semibold">← Voltar para Aluno</button>
                 <div class="flex flex-col sm:flex-row justify-between items-center mb-6 gap-4">
@@ -164,6 +174,7 @@
                 <div id="listaAvaliacoes" class="space-y-4"></div>
             </div>
 
+            <!-- Tela de Carregar Treinos Salvos -->
             <div id="telaCarregar" class="hide">
                 <button id="btnVoltarParaGerenciarAluno_Carregar" class="py-2 px-4 mb-6 bg-btn-secondary text-white rounded-lg font-semibold">← Voltar para Aluno</button>
                 <div class="bg-background-dark border border-border-light p-6 md:p-8 rounded-xl">
@@ -172,6 +183,7 @@
                 </div>
             </div>
             
+            <!-- Formulário de Criação de Treino -->
             <form id="treinoForm" class="hide">
                 <button id="btnVoltarParaGerenciarAluno_Form" type="button" class="py-2 px-4 text-lg bg-btn-secondary text-white rounded-lg font-semibold mb-6">← Voltar</button>
                 
@@ -251,6 +263,7 @@
                 <button id="btnGerarPreview" type="button" class="w-full py-4 text-xl bg-btn-primary text-white rounded-lg font-semibold mt-4">Pré-visualizar e Guardar</button>
             </form>
 
+            <!-- Tela de Preview e Salvar/Exportar -->
             <div id="treinoPreview" class="hide">
                  <div class="bg-background-dark border border-border-light p-6 md:p-8 rounded-xl">
                     <h2 class="text-xl md:text-2xl font-semibold text-primary-blue mb-4 pb-2 border-b border-border-light">Pré-visualização do Plano</h2>
@@ -273,6 +286,7 @@
         </div>
     </div>
 
+    <!-- Modal de Adicionar/Editar Aluno -->
     <div id="addAlunoModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
         <div class="modal-content bg-bg-container p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-lg relative">
             <span id="closeAddAlunoModal" class="absolute top-4 right-4 text-2xl font-bold text-text-muted cursor-pointer">&times;</span>
@@ -304,6 +318,7 @@
         </div>
     </div>
 
+    <!-- Modal de Adicionar Avaliação Física -->
     <div id="addAvaliacaoModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
         <div class="modal-content bg-bg-container p-4 sm:p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-2xl relative">
             <span id="closeAddAvaliacaoModal" class="absolute top-4 right-4 text-2xl font-bold text-text-muted cursor-pointer">&times;</span>
@@ -337,6 +352,7 @@
         </div>
     </div>
 
+    <!-- Modal de Confirmação Genérico -->
     <div id="confirmationModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
         <div class="modal-content bg-bg-container p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-md relative text-center">
             <h3 id="confirmationTitle" class="text-xl font-semibold text-text-light mb-4"></h3>
@@ -348,6 +364,7 @@
         </div>
     </div>
 
+    <!-- Modal para exibir os Gráficos -->
     <div id="chartModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
         <div class="modal-content bg-bg-container p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-4xl relative">
             <span id="closeChartModal" class="absolute top-4 right-4 text-2xl font-bold text-text-muted cursor-pointer">&times;</span>
@@ -368,6 +385,7 @@
         </div>
     </div>
 
+    <!-- Modal para Partilhar Link -->
     <div id="shareLinkModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
         <div class="modal-content bg-bg-container p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-lg relative">
             <span id="closeShareLinkModal" class="absolute top-4 right-4 text-2xl font-bold text-text-muted cursor-pointer">&times;</span>
@@ -388,8 +406,10 @@
         import { getAuth, onAuthStateChanged, createUserWithEmailAndPassword, signInWithEmailAndPassword, signOut, sendPasswordResetEmail } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-auth.js";
         import { getFirestore, doc, setDoc, addDoc, collection, getDocs, getDoc, deleteDoc, serverTimestamp, query, where, updateDoc } from "https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore.js";
         
-        // Ofuscação da chave do Firebase para segurança básica.
-        const encodedConfig = 'eyJhcGlLZXkiOiJBSXphU3lEcjU0NGU0M19pS1dOVkw5VUNLZEtPTk1fczlfZ0d4VHMiLCJhdXRoRG9tYWluIjoic2FtcGxlLWZpcmViYXNlLWFpLWFwcC03YzRiOC5maXJlYmFzZWFwcC5jb20iLCJwcm9qZWN0SWQiOiJzYW1wbGUtZmlyZWJhc2UtYWktYXBwLTdjNGI4Iiwic3RvcmFnZUJ1Y2tldCI6InNhbXBsZS1maXJlYmFzZS1haS1hcHAtN2M0YjguYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjYxNDg5MjIzODQiLCJhcHBJZCI6IjE6NjE0ODkyMjM4NDp3ZWI6YmM2YzllZTM0MGQ5NzI2YWNmYmU5NSJ9';
+        // --- INÍCIO DA ALTERAÇÃO ---
+        // Ofuscação da NOVA chave do Firebase.
+        const encodedConfig = 'eyJhcGlLZXkiOiJBSXphU3lBeVdIeWJLckJoVTFuZWRLNXZ2UE1BcXg5bWhXa3V2Q1kiLCJhdXRoRG9tYWluIjoic2FtcGxlLWZpcmViYXNlLWFpLWFwcC03YzRiOC5maXJlYmFzZWFwcC5jb20iLCJwcm9qZWN0SWQiOiJzYW1wbGUtZmlyZWJhc2UtYWktYXBwLTdjNGI4Iiwic3RvcmFnZUJ1Y2tldCI6InNhbXBsZS1maXJlYmFzZS1haS1hcHAtN2M0YjguYXBwc3BvdC5jb20iLCJtZXNzYWdpbmdTZW5kZXJJZCI6IjYxNDg5MjIzODQiLCJhcHBJZCI6IjE6NjE0ODkyMjM4NDp3ZWI6YmM2YzllZTM0MGQ5NzI2YWNmYmU5NSJ9';
+        // --- FIM DA ALTERAÇÃO ---
         const decodedConfig = atob(encodedConfig);
         const firebaseConfig = JSON.parse(decodedConfig);
 
@@ -447,13 +467,10 @@
                 container.innerHTML += `<div class="mb-4"><h4 class="font-bold text-primary-blue">Observações Gerais:</h4><p class="text-text-muted whitespace-pre-wrap">${data.observacoes}</p></div>`;
             }
 
-            // ---- INÍCIO DA ALTERAÇÃO ----
-            // Adicionamos uma verificação para garantir que 'data.dias' existe e não está vazio.
             if (!data.dias || !Array.isArray(data.dias) || data.dias.length === 0) {
                 container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>';
-                return; // Interrompe a função aqui se não houver treinos.
+                return;
             }
-            // ---- FIM DA ALTERAÇÃO ----
 
             const youtubeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-red-500"><path fill-rule="evenodd" d="M19.802 5.802a3.001 3.001 0 00-2.122-2.122C16.066 3.5 12 3.5 12 3.5s-4.066 0-5.68.18c-.79.09-1.52.412-2.122 1.014-.602.602-.924 1.332-1.014 2.122C3 8.32 3 12 3 12s0 3.68.18 5.198c.09.79.412 1.52 1.014 2.122.602.602 1.332.924 2.122 1.014C7.934 20.5 12 20.5 12 20.5s4.066 0 5.68-.18c.79-.09 1.52-.412 2.122-1.014.602-.602-.924 1.332-1.014-2.122.18-1.518.18-5.198.18-5.198s0-3.68-.18-5.198zM9.75 15.12V8.88l5.25 3.12-5.25 3.12z" clip-rule="evenodd" /></svg>`;
 
@@ -1341,7 +1358,9 @@ Agora, crie o plano para o seguinte aluno:
                 
                 toggleSpinner(true, "A IA está a criar um treino avançado...");
                 try {
-                    const apiKey = 'SUA_API_KEY_AQUI';
+                    // --- INÍCIO DA ALTERAÇÃO ---
+                    const apiKey = 'AIzaSyAyWHybKrBhU1nedK5vvPMAqx9mhWkuvCY';
+                    // --- FIM DA ALTERAÇÃO ---
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
@@ -1978,3 +1997,4 @@ Agora, crie o plano para o seguinte aluno:
     </script>
 </body>
 </html>
+
