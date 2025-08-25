@@ -102,6 +102,10 @@
                     <input type="text" id="signupName" class="w-full p-4 rounded-lg border border-border-light bg-background-dark text-text-light text-lg" required>
                 </div>
                 <div>
+                    <label for="signupDisplayName" class="block mb-2 text-text-muted">Como quer ser chamado(a) (Ex: Prof. João):</label>
+                    <input type="text" id="signupDisplayName" class="w-full p-4 rounded-lg border border-border-light bg-background-dark text-text-light text-lg" required>
+                </div>
+                <div>
                     <label for="signupAge" class="block mb-2 text-text-muted">Idade:</label>
                     <input type="number" id="signupAge" class="w-full p-4 rounded-lg border border-border-light bg-background-dark text-text-light text-lg" required>
                 </div>
@@ -482,14 +486,27 @@
             const container = document.getElementById('publicTreinoContainer');
             container.innerHTML = '';
 
+            // Renderiza a Análise Corporal, se existir
+            if (data.analiseNutricional) {
+                const { imc, tmb, caloriasRecomendadas } = data.analiseNutricional;
+                container.innerHTML += `
+                    <div class="mb-6 bg-bg-container p-4 rounded-lg border border-border-light">
+                        <h3 class="text-lg font-semibold text-primary-blue mb-2">Análise Corporal e Metas</h3>
+                        <div class="grid grid-cols-2 gap-2 text-sm">
+                            <p><strong class="text-text-light">IMC:</strong> ${imc || 'N/D'}</p>
+                            <p><strong class="text-text-light">TMB:</strong> ${tmb || 'N/D'}</p>
+                            <p><strong class="text-text-light">Calorias (Obj.):</strong> ${caloriasRecomendadas || 'N/D'}</p>
+                        </div>
+                    </div>
+                `;
+            }
+
             if (data.observacoes) {
                 container.innerHTML += `<div class="mb-4"><h4 class="font-bold text-primary-blue">Observações Gerais:</h4><p class="text-text-muted whitespace-pre-wrap">${data.observacoes}</p></div>`;
             }
 
             if (!data.dias || !Array.isArray(data.dias) || data.dias.length === 0) {
                 container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>';
-                // Adicionar uma mensagem de debug na página também
-                container.innerHTML += `<p class="text-xs text-center text-red-500">Debug: A propriedade 'dias' não foi encontrada ou está vazia nos dados recebidos.</p>`;
                 return;
             }
 
@@ -506,11 +523,21 @@
                                     <span class="flex-1">${ex.nome}</span>
                                     ${videoLink}
                                 </div>
-                                <span class="text-right whitespace-nowrap">${ex.series || '-' }x${ex.reps || '-'} | ${ex.descanso || '-'}</span>
+                                <span class="text-right whitespace-nowrap">${ex.series || '-' }x ${ex.reps || '-'} | ${ex.descanso || '-'}</span>
                             </li>`;
                 }).join('');
                 container.innerHTML += `<div class="mb-4"><h3 class="text-xl font-semibold text-text-light border-b-2 border-primary-blue pb-1 mb-2">${dia.nome} <span class="text-base font-normal text-text-muted">- ${dia.musculos}</span></h3><ul class="space-y-1">${exerciciosHTML}</ul></div>`;
             });
+
+            // Renderiza Técnicas e Dicas, se existirem
+            if (data.tecnicas && data.tecnicas.length > 0) {
+                let tecnicasHTML = data.tecnicas.map(t => `<li><strong class="text-text-light">${t.nome}:</strong> ${t.descricao}</li>`).join('');
+                container.innerHTML += `<div class="mt-6"><h4 class="text-lg font-semibold text-primary-blue border-b border-border-light pb-1 mb-2">Técnicas Utilizadas</h4><ul class="list-disc list-inside space-y-2 text-text-muted">${tecnicasHTML}</ul></div>`;
+            }
+            if (data.dicas && data.dicas.length > 0) {
+                let dicasHTML = data.dicas.map(d => `<li>${d}</li>`).join('');
+                container.innerHTML += `<div class="mt-6"><h4 class="text-lg font-semibold text-primary-blue border-b border-border-light pb-1 mb-2">Dicas Extra</h4><ul class="list-disc list-inside space-y-2 text-text-muted">${dicasHTML}</ul></div>`;
+            }
         }
 
         // --- LÓGICA PRINCIPAL DA APLICAÇÃO DO TREINADOR ---
@@ -536,6 +563,7 @@
             const btnTogglePassword = document.getElementById('btnTogglePassword');
             const signupForm = document.getElementById('signupForm');
             const signupName = document.getElementById('signupName');
+            const signupDisplayName = document.getElementById('signupDisplayName');
             const signupAge = document.getElementById('signupAge');
             const signupEmail = document.getElementById('signupEmail');
             const signupPassword = document.getElementById('signupPassword');
@@ -599,7 +627,8 @@
                     const docSnap = await getDoc(userDocRef);
                     let userName = "Treinador(a)";
                     if (docSnap.exists()) {
-                        userName = docSnap.data().nome;
+                        const userData = docSnap.data();
+                        userName = userData.nomeExibicao || userData.nome || "Treinador(a)";
                     }
                     appState.currentUser = { ...user, displayName: userName };
 
@@ -646,10 +675,11 @@
                     const userCredential = await createUserWithEmailAndPassword(auth, signupEmail.value, signupPassword.value);
                     await setDoc(doc(db, "usuarios", userCredential.user.uid), {
                         nome: signupName.value,
+                        nomeExibicao: signupDisplayName.value,
                         idade: signupAge.value,
                         email: signupEmail.value
                     });
-                    showNotification(`Bem-vindo, ${signupName.value}!`);
+                    showNotification(`Bem-vindo, ${signupDisplayName.value}!`);
                 } catch (error) { handleAuthError(error); } 
                 finally { toggleSpinner(false); }
             });
@@ -1292,8 +1322,8 @@ Instruções detalhadas obrigatórias:
 
 - Cobertura completa de todos os músculos ao longo da semana: peito, costas, ombros, bíceps, tríceps, quadríceps, glúteos, posteriores, panturrilhas, abdômen, antebraço e trapézio.
 - Exercícios devem ser reais, populares e reconhecidos em academias, usando nomes específicos e equipamento correto (ex: “Supino reto com barra”, “Cadeira extensora”). Não criar variações estranhas ou alternativas múltiplas no mesmo item.
-- Para cada exercício, encontre e inclua um link de um vídeo real e relevante do YouTube que demonstre a execução correta. O link deve ser válido e direto para o vídeo.
-- Divisão organizada por dias (Treino 01, Treino 02…), indicando músculos principais, exercícios, séries, repetições e técnicas aplicadas.
+- Para cada exercício, encontre e inclua um link de um vídeo real e relevante do YouTube que demonstre a execução correta. O link deve ser válido e direto para o vídeo. Priorize vídeos de canais de fitness conhecidos e verificados para garantir a validade dos links.
+- Divisão organizada por dias (Treino 01, Treino 02…), indicando músculos principais, exercícios, séries, repetições e técnicas aplicadas. Para séries e repetições, use apenas números e hífens quando necessário (ex: series: "4", reps: "10-12"). Não repita o número de séries no campo de repetições.
 - **Aplicação de Técnicas Avançadas: Se o treino for para nível Intermediário ou Avançado, aplique UMA técnica avançada (como drop set, superset, rest-pause, etc.) em no MÁXIMO DOIS exercícios por dia de treino. Varie a técnica utilizada entre os dias.**
 - Progressão de intensidade de acordo com o nível do aluno (iniciante, intermediário, avançado), ajustando cargas, volume e complexidade do treino.
 - Equilíbrio entre volume e intensidade, evitando sobrecarga excessiva ou overtraining.
@@ -1485,7 +1515,7 @@ Agora, crie o plano para o seguinte aluno:
                     </div>
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2 mt-2">
                         <input type="text" placeholder="Obs. (ex: Drop set)" value="${ex.obs || ''}" class="ex-obs w-full p-2 bg-bg-container border-border-light border rounded text-sm">
-                        <input type="url" placeholder="Link do vídeo no YouTube (opcional)" value="${ex.videoUrl || ''}" class="ex-video-url w-full p-2 bg-bg-container border-border-light border rounded text-sm">
+                        <input type="url" placeholder="Verifique o link do YouTube (opcional)" value="${ex.videoUrl || ''}" class="ex-video-url w-full p-2 bg-bg-container border-border-light border rounded text-sm">
                     </div>`;
                 container.appendChild(exercicioDiv);
             }
