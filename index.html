@@ -415,6 +415,22 @@
         const auth = getAuth(app);
         const db = getFirestore(app);
 
+        // --- FUNÇÕES GLOBAIS / UTILITÁRIAS ---
+        function toggleSpinner(show, message = "Aguarde...") {
+            const spinner = document.getElementById('loadingSpinner');
+            document.getElementById('spinner-message').textContent = message;
+            spinner.classList.toggle('hide', !show);
+        }
+
+        function showNotification(message, type = 'success') {
+            const notification = document.getElementById('notification');
+            notification.textContent = message;
+            notification.className = `fixed top-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-semibold z-50 transition-all duration-300 ${type === 'success' ? 'bg-btn-primary' : 'bg-btn-danger'} opacity-100 visible translate-y-0`;
+            setTimeout(() => {
+                notification.className = notification.className.replace('opacity-100 visible translate-y-0', 'opacity-0 invisible -translate-y-10');
+            }, 3000);
+        }
+
         // --- INICIALIZAÇÃO ---
         document.addEventListener('DOMContentLoaded', () => {
             const params = new URLSearchParams(window.location.search);
@@ -1955,21 +1971,6 @@ Agora, crie o plano para o seguinte aluno:
                 document.querySelectorAll('#telaAlunos, #telaGerenciarAluno, #telaCarregar, #treinoForm, #treinoPreview, #telaAcompanhamento, #telaBoasVindas').forEach(el => el.classList.add('hide'));
                 const tela = document.getElementById(idTela);
                 if (tela) tela.classList.remove('hide');
-            }
-
-            function showNotification(message, type = 'success') {
-                const notification = document.getElementById('notification');
-                notification.textContent = message;
-                notification.className = `fixed top-5 left-1/2 -translate-x-1/2 p-4 rounded-lg text-white font-semibold z-50 transition-all duration-300 ${type === 'success' ? 'bg-btn-primary' : 'bg-btn-danger'} opacity-100 visible translate-y-0`;
-                setTimeout(() => {
-                    notification.className = notification.className.replace('opacity-100 visible translate-y-0', 'opacity-0 invisible -translate-y-10');
-                }, 3000);
-            }
-
-            function toggleSpinner(show, message = "Aguarde...") {
-                const spinner = document.getElementById('loadingSpinner');
-                document.getElementById('spinner-message').textContent = message;
-                spinner.classList.toggle('hide', !show);
             }
             
             function showConfirmationModal(title, message) {
