@@ -1353,7 +1353,7 @@ Agora, crie o plano para o seguinte aluno:
                 
                 toggleSpinner(true, "A IA está a criar um treino avançado...");
                 try {
-                    const apiKey = "pAGdl3y1qJZXWUKXcPBb8j3PrBs2";
+                    const apiKey = "AIzaSyCIa13DPD2yAF_EfNBah1sY39injiZuiYA";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
