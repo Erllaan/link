@@ -456,6 +456,11 @@
         }
         
         function renderPublicTraining(data) {
+            // --- ADIÇÃO PARA DEBUG ---
+            // Esta linha irá mostrar os dados exatos recebidos do Firebase na consola do navegador.
+            console.log("Dados do treino recebidos do Firebase:", JSON.stringify(data, null, 2));
+            // --- FIM DA ADIÇÃO PARA DEBUG ---
+
             document.getElementById('publicAlunoNome').textContent = data.alunoNome;
             document.getElementById('publicTrainerInfo').textContent = `Preparado por: ${data.trainerName}`;
             const container = document.getElementById('publicTreinoContainer');
@@ -467,15 +472,16 @@
 
             if (!data.dias || !Array.isArray(data.dias) || data.dias.length === 0) {
                 container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>';
+                // Adicionar uma mensagem de debug na página também
+                container.innerHTML += `<p class="text-xs text-center text-red-500">Debug: A propriedade 'dias' não foi encontrada ou está vazia nos dados recebidos.</p>`;
                 return;
             }
 
             const youtubeIcon = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="w-5 h-5 text-red-500"><path fill-rule="evenodd" d="M19.802 5.802a3.001 3.001 0 00-2.122-2.122C16.066 3.5 12 3.5 12 3.5s-4.066 0-5.68.18c-.79.09-1.52.412-2.122 1.014-.602.602-.924 1.332-1.014 2.122C3 8.32 3 12 3 12s0 3.68.18 5.198c.09.79.412 1.52 1.014 2.122.602.602 1.332.924 2.122 1.014C7.934 20.5 12 20.5 12 20.5s4.066 0 5.68-.18c-.79-.09 1.52-.412 2.122-1.014.602-.602-.924 1.332-1.014-2.122.18-1.518.18-5.198.18-5.198s0-3.68-.18-5.198zM9.75 15.12V8.88l5.25 3.12-5.25 3.12z" clip-rule="evenodd" /></svg>`;
 
             data.dias.forEach(dia => {
-                // Defensive check to ensure dia.exercicios is an array
                 if (!dia.exercicios || !Array.isArray(dia.exercicios)) {
-                    return; // Skip this day if it has no exercises
+                    return; 
                 }
                 let exerciciosHTML = dia.exercicios.map(ex => {
                     const videoLink = ex.videoUrl ? `<a href="${ex.videoUrl}" target="_blank" class="ml-2 hover:opacity-75">${youtubeIcon}</a>` : '';
@@ -1363,7 +1369,7 @@ Agora, crie o plano para o seguinte aluno:
                 toggleSpinner(true, "A IA está a criar um treino avançado...");
                 try {
                     // IMPORTANTE: Substitua "SUA_CHAVE_API_VALIDA_AQUI" pela sua chave de API do Google AI Studio.
-                    const apiKey = "AIzaSyCIa13DPD2yAF_EfNBah1sY39injiZuiYA";
+                    const apiKey = "SUA_CHAVE_API_VALIDA_AQUI"; 
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
                     const response = await fetch(apiUrl, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
