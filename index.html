@@ -367,6 +367,19 @@
             </div>
         </div>
     </div>
+    
+    <!-- Modal de Opções de Guardar -->
+    <div id="saveOptionsModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
+        <div class="modal-content bg-bg-container p-6 rounded-xl shadow-2xl border border-border-light w-full max-w-md relative text-center">
+            <h3 id="saveOptionsTitle" class="text-xl font-semibold text-text-light mb-4">Guardar Treino</h3>
+            <p id="saveOptionsMessage" class="text-text-muted mb-6">Este treino já existe. O que deseja fazer?</p>
+            <div class="flex flex-col gap-4">
+                <button id="btnUpdateWorkout" class="w-full py-3 bg-btn-primary text-white rounded-lg font-semibold">Guardar Alterações</button>
+                <button id="btnSaveAsNewWorkout" class="w-full py-3 bg-primary-blue text-white rounded-lg font-semibold">Guardar como Novo Treino</button>
+                <button id="btnCancelSave" class="w-full py-2 bg-btn-secondary text-white rounded-lg font-semibold mt-2">Cancelar</button>
+            </div>
+        </div>
+    </div>
 
     <!-- Modal para exibir os Gráficos -->
     <div id="chartModal" class="modal fixed inset-0 z-50 flex justify-center items-center p-4 hide">
@@ -476,17 +489,13 @@
         }
         
         function renderPublicTraining(data) {
-            // --- ADIÇÃO PARA DEBUG ---
-            // Esta linha irá mostrar os dados exatos recebidos do Firebase na consola do navegador.
             console.log("Dados do treino recebidos do Firebase:", JSON.stringify(data, null, 2));
-            // --- FIM DA ADIÇÃO PARA DEBUG ---
 
             document.getElementById('publicAlunoNome').textContent = data.alunoNome;
             document.getElementById('publicTrainerInfo').textContent = `Preparado por: ${data.trainerName}`;
             const container = document.getElementById('publicTreinoContainer');
             container.innerHTML = '';
 
-            // Renderiza a Análise Corporal, se existir
             if (data.analiseNutricional) {
                 const { imc, tmb, caloriasRecomendadas } = data.analiseNutricional;
                 container.innerHTML += `
@@ -506,7 +515,7 @@
             }
 
             if (!data.dias || !Array.isArray(data.dias) || data.dias.length === 0) {
-                container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>';
+                container.innerHTML += '<p class="text-text-muted text-center py-8">Nenhum dia de treino foi encontrado neste plano.</p>`;
                 return;
             }
 
@@ -516,20 +525,44 @@
                 if (!dia.exercicios || !Array.isArray(dia.exercicios)) {
                     return; 
                 }
+                
                 let exerciciosHTML = dia.exercicios.map(ex => {
                     const videoLink = ex.videoUrl ? `<a href="${ex.videoUrl}" target="_blank" class="ml-2 hover:opacity-75">${youtubeIcon}</a>` : '';
-                    return `<li class="flex justify-between items-center text-text-muted border-b border-border-light py-2 gap-2">
-                                <div class="flex items-center">
-                                    <span class="flex-1">${ex.nome}</span>
-                                    ${videoLink}
-                                </div>
-                                <span class="text-right whitespace-nowrap">${ex.series || '-' }x ${ex.reps || '-'} | ${ex.descanso || '-'}</span>
-                            </li>`;
+                    const obsHTML = ex.obs ? `<tr class="bg-background-dark"><td colspan="5" class="text-xs text-primary-blue pt-1 pb-2 px-2">${ex.obs}</td></tr>` : '';
+
+                    return `
+                        <tr class="border-b border-border-light">
+                            <td class="py-2 px-2 flex items-center">
+                                <span>${ex.nome}</span>
+                                ${videoLink}
+                            </td>
+                            <td class="py-2 px-2 text-center">${ex.series || '-'}</td>
+                            <td class="py-2 px-2 text-center">${ex.reps || '-'}</td>
+                            <td class="py-2 px-2 text-center">${ex.descanso || '-'}</td>
+                        </tr>
+                        ${obsHTML}
+                    `;
                 }).join('');
-                container.innerHTML += `<div class="mb-4"><h3 class="text-xl font-semibold text-text-light border-b-2 border-primary-blue pb-1 mb-2">${dia.nome} <span class="text-base font-normal text-text-muted">- ${dia.musculos}</span></h3><ul class="space-y-1">${exerciciosHTML}</ul></div>`;
+
+                container.innerHTML += `
+                    <div class="mb-4">
+                        <h3 class="text-xl font-semibold text-text-light border-b-2 border-primary-blue pb-1 mb-3">${dia.nome} <span class="text-base font-normal text-text-muted">- ${dia.musculos}</span></h3>
+                        <table class="w-full text-left text-sm">
+                            <thead>
+                                <tr class="text-text-muted">
+                                    <th class="w-2/5 font-semibold py-2 px-2">Exercício</th>
+                                    <th class="w-1/5 font-semibold py-2 px-2 text-center">Séries</th>
+                                    <th class="w-1/5 font-semibold py-2 px-2 text-center">Reps</th>
+                                    <th class="w-1/5 font-semibold py-2 px-2 text-center">Descanso</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                ${exerciciosHTML}
+                            </tbody>
+                        </table>
+                    </div>`;
             });
 
-            // Renderiza Técnicas e Dicas, se existirem
             if (data.tecnicas && data.tecnicas.length > 0) {
                 let tecnicasHTML = data.tecnicas.map(t => `<li><strong class="text-text-light">${t.nome}:</strong> ${t.descricao}</li>`).join('');
                 container.innerHTML += `<div class="mt-6"><h4 class="text-lg font-semibold text-primary-blue border-b border-border-light pb-1 mb-2">Técnicas Utilizadas</h4><ul class="list-disc list-inside space-y-2 text-text-muted">${tecnicasHTML}</ul></div>`;
@@ -550,7 +583,8 @@
                 tecnicas: [],
                 dicas: [],
                 analiseNutricional: {},
-                avaliacoesCache: []
+                avaliacoesCache: [],
+                treinoAbertoId: null
             };
 
             const telaLogin = document.getElementById('telaLogin');
@@ -1242,6 +1276,8 @@
             btnNovoTreino.addEventListener('click', () => {
                 if (!appState.alunoSelecionado) return;
 
+                appState.treinoAbertoId = null; 
+
                 const { altura, idade, objetivo, sexo } = appState.alunoSelecionado;
                 const ultimoPeso = appState.avaliacoesCache.length > 0 ? appState.avaliacoesCache[appState.avaliacoesCache.length - 1].peso : appState.alunoSelecionado.pesoInicial;
                 const imc = calcularIMC(ultimoPeso, altura);
@@ -1322,7 +1358,7 @@ Instruções detalhadas obrigatórias:
 
 - Cobertura completa de todos os músculos ao longo da semana: peito, costas, ombros, bíceps, tríceps, quadríceps, glúteos, posteriores, panturrilhas, abdômen, antebraço e trapézio.
 - Exercícios devem ser reais, populares e reconhecidos em academias, usando nomes específicos e equipamento correto (ex: “Supino reto com barra”, “Cadeira extensora”). Não criar variações estranhas ou alternativas múltiplas no mesmo item.
-- Para cada exercício, encontre e inclua um link de um vídeo real e relevante do YouTube que demonstre a execução correta. O link deve ser válido e direto para o vídeo. Priorize vídeos de canais de fitness conhecidos e verificados para garantir a validade dos links.
+- **É OBRIGATÓRIO** que para cada exercício, você encontre e inclua um link de um vídeo real e relevante do YouTube que demonstre a execução correta no campo \`videoUrl\`. O link deve ser válido e direto para o vídeo. Priorize vídeos de canais de fitness conhecidos e verificados para garantir a validade dos links. A falha em fornecer um \`videoUrl\` para cada exercício resultará numa resposta inválida.
 - Divisão organizada por dias (Treino 01, Treino 02…), indicando músculos principais, exercícios, séries, repetições e técnicas aplicadas. Para séries e repetições, use apenas números e hífens quando necessário (ex: series: "4", reps: "10-12"). Não repita o número de séries no campo de repetições.
 - **Aplicação de Técnicas Avançadas: Se o treino for para nível Intermediário ou Avançado, aplique UMA técnica avançada (como drop set, superset, rest-pause, etc.) em no MÁXIMO DOIS exercícios por dia de treino. Varie a técnica utilizada entre os dias.**
 - Progressão de intensidade de acordo com o nível do aluno (iniciante, intermediário, avançado), ajustando cargas, volume e complexidade do treino.
@@ -1399,7 +1435,8 @@ Agora, crie o plano para o seguinte aluno:
                                                 descanso: { type: "STRING" }, 
                                                 obs: { type: "STRING" },
                                                 videoUrl: { type: "STRING" }
-                                            } 
+                                            },
+                                            required: ["nome", "series", "reps", "descanso", "videoUrl"]
                                         } 
                                     } 
                                 },
@@ -1611,26 +1648,58 @@ Agora, crie o plano para o seguinte aluno:
                 if (!nomeTreino) return showNotification("Dê um nome ao treino para o guardar.", "error");
                 if (!appState.currentUser || !appState.alunoSelecionado) return;
                 
-                toggleSpinner(true, "A guardar na nuvem...");
-                try {
-                    const treinoData = { 
-                        nome: nomeTreino, 
-                        observacoes: document.getElementById('observacoes_gerais').value, 
-                        dias: appState.treinoSemanal, 
-                        tecnicas: appState.tecnicas,
-                        dicas: appState.dicas,
-                        analiseNutricional: appState.analiseNutricional,
-                        criadoEm: serverTimestamp()
-                    };
-                    const treinosRef = collection(db, "usuarios", appState.currentUser.uid, "alunos", appState.alunoSelecionado.id, "treinos");
-                    await addDoc(treinosRef, treinoData);
-                    showNotification("Treino guardado com sucesso!");
-                    mostrarTela('telaGerenciarAluno');
-                } catch (error) { 
-                    showNotification("Erro ao guardar o treino.", "error");
-                    console.error(error);
-                } 
-                finally { toggleSpinner(false); }
+                const treinoData = { 
+                    nome: nomeTreino, 
+                    observacoes: document.getElementById('observacoes_gerais').value, 
+                    dias: appState.treinoSemanal, 
+                    tecnicas: appState.tecnicas,
+                    dicas: appState.dicas,
+                    analiseNutricional: appState.analiseNutricional,
+                    criadoEm: serverTimestamp()
+                };
+
+                if (appState.treinoAbertoId) {
+                    const choice = await showSaveOptionsModal();
+                    if (choice === 'update') {
+                        toggleSpinner(true, "A atualizar treino...");
+                        try {
+                            const treinoDocRef = doc(db, "usuarios", appState.currentUser.uid, "alunos", appState.alunoSelecionado.id, "treinos", appState.treinoAbertoId);
+                            await updateDoc(treinoDocRef, treinoData);
+                            showNotification("Treino atualizado com sucesso!");
+                            mostrarTela('telaGerenciarAluno');
+                        } catch (error) {
+                            showNotification("Erro ao atualizar o treino.", "error");
+                            console.error(error);
+                        } finally {
+                            toggleSpinner(false);
+                        }
+                    } else if (choice === 'save_new') {
+                        toggleSpinner(true, "A guardar como novo...");
+                        try {
+                            const treinosRef = collection(db, "usuarios", appState.currentUser.uid, "alunos", appState.alunoSelecionado.id, "treinos");
+                            await addDoc(treinosRef, treinoData);
+                            showNotification("Novo treino guardado com sucesso!");
+                            mostrarTela('telaGerenciarAluno');
+                        } catch (error) {
+                            showNotification("Erro ao guardar o novo treino.", "error");
+                            console.error(error);
+                        } finally {
+                            toggleSpinner(false);
+                        }
+                    }
+                } else {
+                    toggleSpinner(true, "A guardar na nuvem...");
+                    try {
+                        const treinosRef = collection(db, "usuarios", appState.currentUser.uid, "alunos", appState.alunoSelecionado.id, "treinos");
+                        await addDoc(treinosRef, treinoData);
+                        showNotification("Treino guardado com sucesso!");
+                        mostrarTela('telaGerenciarAluno');
+                    } catch (error) { 
+                        showNotification("Erro ao guardar o treino.", "error");
+                        console.error(error);
+                    } 
+                    finally { toggleSpinner(false); }
+                }
             });
 
             async function carregarTreinosSalvos() {
@@ -1699,6 +1768,7 @@ Agora, crie o plano para o seguinte aluno:
                     try {
                         const docSnap = await getDoc(doc(db, "usuarios", appState.currentUser.uid, "alunos", appState.alunoSelecionado.id, "treinos", treinoId));
                         if (docSnap.exists()) {
+                            appState.treinoAbertoId = treinoId;
                             const treino = docSnap.data();
                             appState.treinoSemanal = treino.dias;
                             appState.tecnicas = treino.tecnicas || [];
@@ -2023,6 +2093,32 @@ Agora, crie o plano para o seguinte aluno:
                     }
 
                     btnConfirm.addEventListener('click', confirmHandler);
+                    btnCancel.addEventListener('click', cancelHandler);
+                });
+            }
+
+            function showSaveOptionsModal() {
+                return new Promise((resolve) => {
+                    const modal = document.getElementById('saveOptionsModal');
+                    modal.classList.remove('hide');
+
+                    const btnUpdate = document.getElementById('btnUpdateWorkout');
+                    const btnSaveNew = document.getElementById('btnSaveAsNewWorkout');
+                    const btnCancel = document.getElementById('btnCancelSave');
+
+                    const updateHandler = () => { cleanup(); resolve('update'); };
+                    const saveNewHandler = () => { cleanup(); resolve('save_new'); };
+                    const cancelHandler = () => { cleanup(); resolve('cancel'); };
+                    
+                    const cleanup = () => {
+                        modal.classList.add('hide');
+                        btnUpdate.removeEventListener('click', updateHandler);
+                        btnSaveNew.removeEventListener('click', saveNewHandler);
+                        btnCancel.removeEventListener('click', cancelHandler);
+                    }
+
+                    btnUpdate.addEventListener('click', updateHandler);
+                    btnSaveNew.addEventListener('click', saveNewHandler);
                     btnCancel.addEventListener('click', cancelHandler);
                 });
             }
