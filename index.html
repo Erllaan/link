@@ -1362,6 +1362,7 @@ Agora, crie o plano para o seguinte aluno:
                 
                 toggleSpinner(true, "A IA está a criar um treino avançado...");
                 try {
+                    // IMPORTANTE: Substitua "SUA_CHAVE_API_VALIDA_AQUI" pela sua chave de API do Google AI Studio.
                     const apiKey = "AIzaSyCIa13DPD2yAF_EfNBah1sY39injiZuiYA";
                     const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
                     const payload = { contents: [{ role: "user", parts: [{ text: prompt }] }], generationConfig: { responseMimeType: "application/json", responseSchema: schema } };
@@ -1479,6 +1480,8 @@ Agora, crie o plano para o seguinte aluno:
 
                 appState.treinoSemanal = [];
                 let formValido = true;
+                let totalExercicios = 0;
+
                 dias.forEach(diaEl => {
                     const nomeDia = diaEl.querySelector('.dia-nome').value;
                     const musculosDia = diaEl.querySelector('.dia-musculos').value;
@@ -1495,10 +1498,15 @@ Agora, crie o plano para o seguinte aluno:
                             obs: exEl.querySelector('.ex-obs').value,
                             videoUrl: exEl.querySelector('.ex-video-url').value
                         });
+                        totalExercicios++;
                     });
                     appState.treinoSemanal.push({ nome: nomeDia, musculos: musculosDia, exercicios });
                 });
                 if (!formValido) return showNotification("Preencha o nome e os grupos musculares de todos os dias, e o nome de todos os exercícios.", "error");
+
+                if (totalExercicios === 0) {
+                    return showNotification("O treino não contém exercícios. Adicione exercícios manualmente ou gere um novo treino com a IA.", "error");
+                }
 
                 renderizarPreview();
                 mostrarTela('treinoPreview');
